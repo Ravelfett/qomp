@@ -58,8 +58,8 @@ class Player extends Entity{
     super(x, y, 10, 10);
     this.vx = 1;
     this.vy = 1;
-    this.speed = 3;
-    this.color = "#1c8e49";
+    this.speed = 1.5;
+    this.color = "rgb(145, 24, 201)";
   }
 
   update(){
@@ -73,14 +73,14 @@ class ShadowPlayer extends Entity{
   constructor(x, y){
     super(x, y, 10, 10);
     this.time = 0;
-    this.color = "rgba(200, 18, 90, 0.3)";
+    this.color = 1;
 
     this.zIndex = -1;
   }
 
   update(){
     this.time ++;
-    this.color = "rgba(50, 198, 90, "+(1-(this.time/30))/4 +")";
+    this.color = "rgba(145, 24, 201, "+(1-(this.time/30))/4 +")";
     if (this.time>30) {
       this.toDelete = true;
     }

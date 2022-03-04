@@ -1,8 +1,24 @@
 class World{
   constructor(){
     this.camera = {x: 300/2, y: 150/2, zoom: 5};
+    this.cameraTargets = [
+      {
+        x: 300/2, y: 150/2, zoom: 5
+      },
+      {
+        x: 450, y: 150/2, zoom: 5
+      },
+      {
+        x: 750, y: 130, zoom: 5
+      },
+      {
+        x: 750, y: 330, zoom: 1
+      },
+    ]
     this.entities = {};
     this.players = {};
+
+    this.collided = 0;
   }
   addPlayer(p){
     p.world = this;
@@ -26,6 +42,16 @@ class World{
     }
     for(let i in this.entities){
       for(let j in this.players){
+        let d = 0;
+        for(let i in this.cameraTargets){
+          if((this.cameraTargets[i].x-this.players[j].x)**2+(this.cameraTargets[i].y-this.players[j].y)**2<
+        (this.cameraTargets[d].x-this.players[j].x)**2+(this.cameraTargets[d].y-this.players[j].y)**2){
+          d = i;
+        }
+        }
+        this.camera.x+=(this.cameraTargets[d].x-this.camera.x)/600;
+        this.camera.y+=(this.cameraTargets[d].y-this.camera.y)/600;
+        this.camera.zoom+=(this.cameraTargets[d].zoom-this.camera.zoom)/300;
         if(i!=j){
           let col = this.entities[i].collision(this.players[j]);
           if(col>0){
@@ -41,6 +67,7 @@ class World{
             if (col == 4) {
               this.players[j].vy = -Math.abs(this.players[j].vy)
             }
+            this.collided = Date.now();
           }
         }
       }
@@ -51,7 +78,13 @@ class World{
   }
   render(ctx, width, height){
     ctx.scale(this.camera.zoom, this.camera.zoom);
-    ctx.translate(-this.camera.x + width/2 / this.camera.zoom, -this.camera.y + height/2 / this.camera.zoom);
+    let xoff = 0;
+    let yoff = 0;
+    if (Date.now()-this.collided<40) {
+      xoff = (Math.random()-0.5)*3;
+      yoff = (Math.random()-0.5)*3;
+    }
+    ctx.translate(-this.camera.x + width/2 / this.camera.zoom + xoff, -this.camera.y + height/2 / this.camera.zoom + yoff);
     let entities = Object.values(this.entities).sort((a, b) => a.zIndex - b.zIndex);
     for(let i in entities){
       entities[i].render(ctx);
