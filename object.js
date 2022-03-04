@@ -91,6 +91,34 @@ class ShadowPlayer extends Entity{
 }
 
 
+class Particle extends Entity{
+  constructor(x, y){
+    super(x, y, 1, 1);
+    this.time = 0;
+    this.color = 1;
+
+    this.vx = (Math.random()-0.5)*2;
+    this.vy = (Math.random()-0.5)*2;
+
+    this.zIndex = 1;
+  }
+
+  update(){
+    this.x += this.vx;
+    this.y += this.vy;
+    this.vy+=0.03;
+    this.time ++;
+    this.color = "rgba(255, 255, 255, "+(1-(this.time/30))/2 +")";
+    if (this.time>30) {
+      this.toDelete = true;
+    }
+  }
+  collision(){
+
+  }
+}
+
+
 
 class PaddleX extends Entity{
   constructor(x, y, g){

@@ -5,6 +5,23 @@ glUtils.SL.init({
 });
 
 function main() {
+
+
+  myAudio = new Audio('qomp.wav');
+  if (typeof myAudio.loop == 'boolean')
+  {
+      myAudio.loop = true;
+  }
+  else
+  {
+      myAudio.addEventListener('ended', function() {
+          this.currentTime = 0;
+          this.play();
+      }, false);
+  }
+
+  boom = new Audio('boom.wav');
+
   const canvas = document.getElementById("cnv");
   var width = window.innerWidth;
   var height = window.innerHeight;
@@ -140,6 +157,7 @@ function main() {
     if (e.button == 0) {
       world.inputPlayer(s);
 
+      myAudio.play();
     }
     if (e.button == 2) {}
   };

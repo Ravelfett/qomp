@@ -54,20 +54,31 @@ class World{
         this.camera.zoom+=(this.cameraTargets[d].zoom-this.camera.zoom)/300;
         if(i!=j){
           let col = this.entities[i].collision(this.players[j]);
+          let xoff = 0;
+          let yoff = 0;
           if(col>0){
             if (col == 1) {
-              this.players[j].vx = Math.abs(this.players[j].vx)
+              this.players[j].vx = Math.abs(this.players[j].vx);
+              xoff = -5;
             }
             if (col == 2) {
-              this.players[j].vx = -Math.abs(this.players[j].vx)
+              this.players[j].vx = -Math.abs(this.players[j].vx);
+              xoff = 5;
             }
             if (col == 3) {
-              this.players[j].vy = Math.abs(this.players[j].vy)
+              this.players[j].vy = Math.abs(this.players[j].vy);
+              yoff = -5;
             }
             if (col == 4) {
-              this.players[j].vy = -Math.abs(this.players[j].vy)
+              this.players[j].vy = -Math.abs(this.players[j].vy);
+              yoff = 5;
             }
             this.collided = Date.now();
+            for (let k = 0; k < 5; k++) {
+              this.addEntity(new Particle(this.players[j].x+this.players[j].w/2+xoff, this.players[j].y+this.players[j].h/2+yoff));
+            }
+            boom.currentTime = 0;
+            boom.play();
           }
         }
       }
