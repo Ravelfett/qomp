@@ -52,13 +52,15 @@
   		return fract(cos(dot(p, K1)) * 12345.6789 );
   	}
 
+    float str = 0.007;
+
     void main() {
       float dist = distance(v_TexCoord, vec2(0.5, 0.5));
-      //vec2 coord = ((v_TexCoord-vec2(0.5, 0.5))*(dist*5.)*(dist*5.))/50.+v_TexCoord;
-      vec2 coord = vec2(0.5, 0.5) + ((v_TexCoord-vec2(0.5, 0.5)) * (pow(dist, 4.)+1.))/1.1;
-      float r = texture2D(image, coord - (coord - 0.5) * 0.007).r;
+      //vec2 coord = v_TexCoord;
+      vec2 coord = vec2(0.5, 0.5) + ((v_TexCoord-vec2(0.5, 0.5)) * (pow(dist, 4.)+1.))/1.1 + vec2(cos(v_TexCoord.y*30. + random(vec2(v_TexCoord.y, u_time))*30. + u_time/300.)*0.0003, 0);
+      float r = texture2D(image, coord - (coord - 0.5) * str).r;
       float g = texture2D(image, coord).g;
-      float b = texture2D(image, coord + (coord - 0.5) * 0.007).b;
+      float b = texture2D(image, coord + (coord - 0.5) * str).b;
       vec2 coords = coord;
       coords.y *= random(vec2(coords.y, u_time));
       gl_FragColor = vec4((vec3(r, g, b) * (1.-dist/2.) + random(coords) * 0.1), 1.);
@@ -67,6 +69,7 @@
 
 
   <script type="text/javascript" src="glUtils.js"></script>
+  <script src="map.js" type='text/javascript'></script>
   <script src="world.js" type='text/javascript'></script>
   <script src="object.js" type='text/javascript'></script>
   <script src="main.js" type='text/javascript'></script>

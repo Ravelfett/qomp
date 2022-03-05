@@ -6,18 +6,14 @@ glUtils.SL.init({
 
 function main() {
 
-
   myAudio = new Audio('qomp.wav');
-  if (typeof myAudio.loop == 'boolean')
-  {
-      myAudio.loop = true;
-  }
-  else
-  {
-      myAudio.addEventListener('ended', function() {
-          this.currentTime = 0;
-          this.play();
-      }, false);
+  if (typeof myAudio.loop == 'boolean') {
+    myAudio.loop = true;
+  } else {
+    myAudio.addEventListener('ended', function() {
+      this.currentTime = 0;
+      this.play();
+    }, false);
   }
 
   boom = new Audio('boom.wav');
@@ -26,7 +22,7 @@ function main() {
   var width = window.innerWidth;
   var height = window.innerHeight;
 
-  let gl = glUtils.checkWebGL(canvas);
+  const gl = glUtils.checkWebGL(canvas);
 
 
 
@@ -38,13 +34,13 @@ function main() {
   gl.useProgram(program);
 
 
-  let positionLocation = gl.getAttribLocation(program, "position");
-  let texCoordLocation = gl.getAttribLocation(program, "texcoord");
-  let resolutionLocation = gl.getUniformLocation(program, "resolution");
-  let timeLocation = gl.getUniformLocation(program, "u_time");
+  const positionLocation = gl.getAttribLocation(program, "position");
+  const texCoordLocation = gl.getAttribLocation(program, "texcoord");
+  const resolutionLocation = gl.getUniformLocation(program, "resolution");
+  const timeLocation = gl.getUniformLocation(program, "u_time");
 
 
-  let texCoordBuffer = gl.createBuffer();
+  const texCoordBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer);
   gl.bufferData(
     gl.ARRAY_BUFFER,
@@ -59,11 +55,11 @@ function main() {
     gl.STATIC_DRAW);
 
   // create position buffer
-  let positionBuffer = gl.createBuffer();
+  const positionBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
   //create texture
-  let texture = gl.createTexture();
+  const texture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, texture);
 
   //normalize image to powers of two
@@ -107,21 +103,21 @@ function main() {
       gl.UNSIGNED_BYTE,
       bufferCanvas);
 
-      gl.uniform2f(resolutionLocation,
-        gl.canvas.width,
-        gl.canvas.height);
+    gl.uniform2f(resolutionLocation,
+      gl.canvas.width,
+      gl.canvas.height);
 
 
-        gl.uniform1f(timeLocation,
-          Date.now()%1000);
+    gl.uniform1f(timeLocation,
+      Date.now() % 1000);
 
 
     //draw
     gl.drawArrays(gl.TRIANGLES, 0, 6);
   };
 
-  let offscreen = document.createElement('canvas');
-  let offscreenContext = offscreen.getContext("2d");
+  const offscreen = document.createElement('canvas');
+  const offscreenContext = offscreen.getContext("2d");
 
   function resize() {
     width = window.innerWidth,
@@ -147,47 +143,94 @@ function main() {
 
   document.addEventListener('contextmenu', event => event.preventDefault());
 
+  document.addEventListener("keydown", (e) => {
+    if (e.repeat) return;
+    if (e.keyCode == 32) {
+      if (editMode) {
+        update = !update;
+      }
+    }
+    if (e.keyCode == 67) {
+      if (editMode) {
+        world.addEntity(new Breakable(mouse[0], mouse[1], 10, 10))
+      }
+    }
+    if (e.keyCode == 88) {
+      if (editMode) {
+        world.addEntity(new Obstacle(mouse[0], mouse[1], 10, 10))
+      }
+    }
+    if (e.keyCode == 69) {
+      console.log(JSON.stringify(world.export()));
+    }
+    if (e.keyCode == 82) {
+      world.entities = {};
+      console.log(world.players);
+      world.loadWorld(JSON.parse(saves.pop()));
+      for(const i in world.players){
+        world.addEntity(world.players[i]);
+      }
+    }
+  }, false);
+
   document.addEventListener('mousemove', (p) => {
     const t = canvas.getBoundingClientRect();
-    /*mouse[0] = (p.pageX - t.left);
-    mouse[1] = (p.pageY - t.top);*/
+    mouse[0] = (p.pageX - t.left);
+    mouse[1] = (p.pageY - t.top);
+
+    mouse[0] = (mouse[0] - width/2)/world.camera.zoom + world.camera.x;
+    mouse[1] = (mouse[1] - height/2)/world.camera.zoom + world.camera.y;
   }, false);
 
   document.onmousedown = function(e) {
     if (e.button == 0) {
       world.inputPlayer(s);
 
-      myAudio.play();
+      //myAudio.play();
     }
-    if (e.button == 2) {}
+    if (e.button == 2) {
+      for(const i in world.entities){
+        if ((mouse[0]-(world.entities[i].x + world.entities[i].w))**2 + (mouse[1]-(world.entities[i].y + world.entities[i].h))**2 < 50) {
+          sizing = i;
+          saves.push(JSON.stringify(world.export()));
+          return;
+        }
+
+        if(world.entities[i].collision({x: mouse[0], y: mouse[1], w: 0, h: 0})){
+          moving = i;
+          offset = [world.entities[i].x-mouse[0], world.entities[i].y-mouse[1]];
+          saves.push(JSON.stringify(world.export()));
+        }
+      }
+    }
   };
 
   document.onmouseup = function(e) {
     if (e.button == 0) {}
-    if (e.button == 2) {}
+    if (e.button == 2) {
+      moving = null;
+      sizing = null;
+    }
   };
 
   const world = new World();
-  let p = new Player(50, 50);
-  let s = p.id;
+  const p = new Player(50, 50);
+  const s = p.id;
   world.addPlayer(p);
 
 
-  world.addEntity(new Obstacle(-50, -45, 1100, 50));
-  world.addEntity(new Obstacle(-50, 150, 700, 320));
-  world.addEntity(new Obstacle(400, -45, 550, 90));
-  world.addEntity(new Obstacle(400, 105, 330, 50));
-  world.addEntity(new Obstacle(700, 190, 30, 30));
-  world.addEntity(new Obstacle(900, 0, 50, 500));
-  world.addEntity(new Obstacle(700, 210, 300, 60));
-  world.addEntity(new Obstacle(600, 400, 350, 60));
+  world.loadWorld(map);
 
-  world.addEntity(new PaddleX(20, 20, 5));
-  world.addEntity(new PaddleX(285, 20, 45));
+  let editMode = false;
+  let saves = [];
 
+  let mouse = [0, 0];
+  let moving = null;
+  let sizing = null;
 
+  let update = true;
 
-
+  //console.log(JSON.stringify(world.export()));
 
   function render() {
     offscreenContext.clearRect(0, 0, width, height);
@@ -197,7 +240,22 @@ function main() {
     offscreenContext.fill();
     offscreenContext.closePath();
 
-    world.update();
+    if (moving != null) {
+      world.entities[moving].x = Math.round(offset[0]+mouse[0]);
+      world.entities[moving].y = Math.round(offset[1]+mouse[1]);
+    }
+    if (sizing != null) {
+      world.entities[sizing].w = Math.round(mouse[0] - world.entities[sizing].x);
+      world.entities[sizing].h = Math.round(mouse[1] - world.entities[sizing].y);
+    }
+
+    if (!update) {
+      world.camera.zoom = 1;
+    }
+
+    if (update) {
+      world.update();
+    }
     world.render(offscreenContext, width, height);
 
     renderr(offscreen)

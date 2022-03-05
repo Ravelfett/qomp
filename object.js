@@ -13,6 +13,17 @@ class Entity{
     this.toDelete = false;
 
     this.zIndex = 0;
+
+    this.exportable = false;
+  }
+
+  export(){
+    return {
+      x: this.x,
+      y: this.y,
+      w: this.w,
+      h: this.h
+    }
   }
 
   render(ctx){
@@ -44,11 +55,52 @@ class Entity{
     }
     return 0;
   }
+
+  collide(col){
+
+  }
 }
 
 class Obstacle extends Entity{
   constructor(x, y, w, h){
     super(x, y, w, h);
+
+    this.exportable = true;
+  }
+
+  export(){
+    const obj = super.export();
+    obj.type = "Obstacle";
+    return obj
+  }
+}
+
+class Breakable extends Entity{
+  constructor(x, y, w, h){
+    super(x, y, w, h);
+
+    this.life = 5;
+
+    this.zIndex = -1;
+
+    this.exportable = true;
+  }
+  collide(){
+    this.life -= 1;
+    if (this.life<0) {
+      this.toDelete = true;
+    }
+    this.updateColor();
+  }
+
+  updateColor(){
+    this.color = `rgb(255, ${255-(5-this.life)*40}, ${255-(5-this.life)*40})`
+  }
+
+  export(){
+    const obj = super.export();
+    obj.type = "Breakable";
+    return obj
   }
 }
 
@@ -65,6 +117,30 @@ class Player extends Entity{
   update(){
     this.x += this.vx * this.speed;
     this.y += this.vy * this.speed;
+  }
+
+  collide(col){
+    let xoff = 0;
+    let yoff = 0;
+    if (col == 1) {
+      this.vx = Math.abs(this.vx);
+      xoff = -5;
+    }
+    if (col == 2) {
+      this.vx = -Math.abs(this.vx);
+      xoff = 5;
+    }
+    if (col == 3) {
+      this.vy = Math.abs(this.vy);
+      yoff = -5;
+    }
+    if (col == 4) {
+      this.vy = -Math.abs(this.vy);
+      yoff = 5;
+    }
+    for (let k = 0; k < 5; k++) {
+      this.world.addEntity(new Particle(this.x+this.w/2+xoff, this.y+this.h/2+yoff));
+    }
   }
 }
 
@@ -124,6 +200,8 @@ class PaddleX extends Entity{
   constructor(x, y, g){
     super(x, y, 5, 50);
     this.g = g;
+
+    this.exportable = true;
   }
 
   update(){
@@ -131,5 +209,14 @@ class PaddleX extends Entity{
       this.y += (this.world.players[i].y-this.y-this.h/2)/this.g;
       break;
     }
+  }
+
+  export(){
+    const obj = super.export();
+    obj.type = "PaddleX";
+    delete obj.w;
+    delete obj.h;
+    obj.g = this.g;
+    return obj
   }
 }

@@ -173,7 +173,6 @@
           };
         }
         glUtils.SL.Shaders[version][element.getAttribute(glUtils.SL.dataType)] = req;
-        glUtils.SL.checkForComplete();
       }
     }
   };
