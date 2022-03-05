@@ -62,7 +62,7 @@ class World{
             this.players[j].collide(col)
             this.collided = Date.now();
             boom.currentTime = 0;
-            //boom.play();
+            boom.play();
           }
         }
       }

@@ -186,7 +186,7 @@ function main() {
     if (e.button == 0) {
       world.inputPlayer(s);
 
-      //myAudio.play();
+      myAudio.play();
     }
     if (e.button == 2) {
       for(const i in world.entities){
