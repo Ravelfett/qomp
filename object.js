@@ -184,7 +184,7 @@ class Particle extends Entity{
     this.y += this.vy;
     this.vy+=0.03;
     this.time ++;
-    this.color = "rgba(255, 255, 255, "+(1-(this.time/30))/2 +")";
+    this.color = "rgba(255, 255, 255, "+(1-(this.time/30)) +")";
     if (this.time>30) {
       this.toDelete = true;
     }

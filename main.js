@@ -7,6 +7,7 @@ glUtils.SL.init({
 function main() {
 
   myAudio = new Audio('qomp.wav');
+  myAudio.volume = 1/2;
   if (typeof myAudio.loop == 'boolean') {
     myAudio.loop = true;
   } else {
@@ -17,6 +18,7 @@ function main() {
   }
 
   boom = new Audio('boom.wav');
+  boom.volume = 1/2;
 
   const canvas = document.getElementById("cnv");
   var width = window.innerWidth;
@@ -140,6 +142,11 @@ function main() {
     resize();
     window.requestAnimationFrame(render);
   }
+
+  document.getElementById("volume").addEventListener("input", (e)=>{
+    myAudio.volume = Number(e.target.value)/100;
+    boom.volume = Number(e.target.value)/100;
+  })
 
   document.addEventListener('contextmenu', event => event.preventDefault());
 
