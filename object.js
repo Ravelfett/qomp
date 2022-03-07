@@ -104,6 +104,28 @@ class Breakable extends Entity{
   }
 }
 
+class Spike extends Entity{
+  constructor(x, y, w, h){
+    super(x, y, w, h);
+
+    this.zIndex = -1;
+
+    this.exportable = true;
+	
+	this.color = "rgb(255, 255, 0)";
+	
+  }
+  collide(o ,e){
+    o.kill();
+  }
+
+  export(){
+    const obj = super.export();
+    obj.type = "Spike";
+    return obj
+  }
+}
+
 
 class Player extends Entity{
   constructor(x, y){
@@ -112,6 +134,8 @@ class Player extends Entity{
     this.vy = 1;
     this.speed = 1.5;
     this.color = "rgb(145, 24, 201)";
+	
+	this.checkpoint = {x: x, y: y};
   }
 
   update(){
@@ -119,7 +143,7 @@ class Player extends Entity{
     this.y += this.vy * this.speed;
   }
 
-  collide(col){
+  collide(o, col){
     let xoff = 0;
     let yoff = 0;
     if (col == 1) {
@@ -141,6 +165,11 @@ class Player extends Entity{
     for (let k = 0; k < 5; k++) {
       this.world.addEntity(new Particle(this.x+this.w/2+xoff, this.y+this.h/2+yoff));
     }
+  }
+  
+  kill(){
+	this.x = this.checkpoint.x;
+	this.y = this.checkpoint.y;
   }
 }
 

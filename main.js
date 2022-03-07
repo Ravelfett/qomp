@@ -152,20 +152,30 @@ function main() {
 
   document.addEventListener("keydown", (e) => {
     if (e.repeat) return;
+	if(editMode){
+		if (e.keyCode == 37) {
+		left = true;
+    }
+    if (e.keyCode == 38) {
+      up = true;
+    }
+    if (e.keyCode == 39) {
+      right = true;
+    }
+	if (e.keyCode == 40) {
+      down = true;
+    }
     if (e.keyCode == 32) {
-      if (editMode) {
-        update = !update;
-      }
+      update = !update;
     }
     if (e.keyCode == 67) {
-      if (editMode) {
-        world.addEntity(new Breakable(mouse[0], mouse[1], 10, 10))
-      }
+      world.addEntity(new Breakable(mouse[0], mouse[1], 10, 10))
     }
     if (e.keyCode == 88) {
-      if (editMode) {
-        world.addEntity(new Obstacle(mouse[0], mouse[1], 10, 10))
-      }
+      world.addEntity(new Obstacle(mouse[0], mouse[1], 10, 10))
+    }
+	if (e.keyCode == 87) {
+      world.addEntity(new Spike(mouse[0], mouse[1], 10, 10))
     }
     if (e.keyCode == 69) {
       console.log(JSON.stringify(world.export()));
@@ -178,7 +188,26 @@ function main() {
         world.addEntity(world.players[i]);
       }
     }
+	}
   }, false);
+  
+    document.addEventListener("keyup", (e) => {
+	if(editMode){
+		if (e.keyCode == 37) {
+		left = false;
+    }
+    if (e.keyCode == 38) {
+      up = false;
+    }
+    if (e.keyCode == 39) {
+      right = false;
+    }
+	if (e.keyCode == 40) {
+      down = false;
+    }
+	}
+  }, false);
+  
 
   document.addEventListener('mousemove', (p) => {
     const t = canvas.getBoundingClientRect();
@@ -228,7 +257,7 @@ function main() {
 
   world.loadWorld(map);
 
-  let editMode = false;
+  let editMode = true;
   let saves = [];
 
   let mouse = [0, 0];
@@ -236,6 +265,13 @@ function main() {
   let sizing = null;
 
   let update = true;
+  
+  let left = false;
+  let up = false;
+  let right = false;
+  let down = false;
+  
+  const spee = 5;
 
   //console.log(JSON.stringify(world.export()));
 
@@ -259,6 +295,11 @@ function main() {
     if (!update) {
       world.camera.zoom = 1;
     }
+	
+	if(left){world.camera.x-=spee};
+	if(up){world.camera.y-=spee};
+	if(right){world.camera.x+=spee};
+	if(down){world.camera.y+=spee};
 
     if (update) {
       world.update();

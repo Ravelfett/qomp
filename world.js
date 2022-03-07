@@ -17,6 +17,9 @@ class World{
       {
         x: 830, y: 460, zoom: 7
       },
+	  {
+        x: 930, y: 640, zoom: 5
+      },
     ]
     this.entities = {};
     this.players = {};
@@ -58,8 +61,8 @@ class World{
         if(i!=j){
           const col = this.entities[i].collision(this.players[j]);
           if(col>0){
-            this.entities[i].collide(col);
-            this.players[j].collide(col)
+            this.entities[i].collide(this.players[j], col);
+            this.players[j].collide(this.entities[i], col)
             this.collided = Date.now();
             boom.currentTime = 0;
             boom.play();
@@ -107,6 +110,9 @@ class World{
         case "Breakable":
           entity = new Breakable(m[i].x, m[i].y, m[i].w, m[i].h)
           break;
+		case "Spike":
+		  entity = new Spike(m[i].x, m[i].y, m[i].w, m[i].h)
+	      break;
         case "PaddleX":
           entity = new PaddleX(m[i].x, m[i].y, m[i].g)
           break;
